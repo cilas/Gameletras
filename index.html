@@ -1,144 +1,178 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<title>EducaTrace Pro</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap" rel="stylesheet">
+<meta charset="UTF-8" />
+<title>EducaTrace Pro - Edição Especial</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
 <style>
-    :root { 
-        --primary: #6C63FF; 
-        --secondary: #FF6584; 
-        --success: #48C774; 
-        --bg-grad: linear-gradient(135deg, #f6f8fd 0%, #f1f5f9 100%);
-        --text: #2D3748;
-    }
-    
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Roboto', sans-serif; }
-    
-    body { 
-        height: 100vh; display: flex; flex-direction: column; align-items: center; 
-        background: var(--bg-grad); padding: 15px; overflow: hidden; touch-action: none;
-    }
+  :root{
+    --primary:#6C63FF;
+    --secondary:#FF6584;
+    --success:#48C774;
+    --bg-grad:linear-gradient(135deg,#f6f8fd 0%,#f1f5f9 100%);
+    --text:#2D3748;
+    --hint:#E2E8F0;
+  }
 
-    h3 { 
-        color: var(--text); margin-bottom: 12px; font-size: 1.6rem; 
-        text-transform: uppercase; letter-spacing: 1px;
-    }
-    
-    h3 span { color: var(--primary); font-size: 2rem; }
+  *{box-sizing:border-box;margin:0;padding:0;font-family:'Fredoka',sans-serif;-webkit-tap-highlight-color:transparent}
+  body{
+    height:100vh;display:flex;flex-direction:column;align-items:center;
+    background:var(--bg-grad);padding:12px;overflow:hidden;
+    touch-action:none;
+  }
 
-    #canvas-container {
-        position: relative; width: 100%; max-width: 380px; flex: 1;
-        background: white; border-radius: 24px; border: 6px solid var(--primary);
-        box-shadow: 0 15px 35px rgba(108, 99, 255, 0.15); overflow: hidden;
-    }
-    
-    canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+  header{
+    width:100%;max-width:430px;display:flex;align-items:center;justify-content:space-between;
+    padding:4px 6px;margin-bottom:10px;
+  }
 
-    #ui { width: 100%; max-width: 400px; margin-top: 20px; display: flex; flex-direction: column; gap: 15px; }
-    .row { display: flex; gap: 10px; justify-content: center; }
-    
-    button {
-        padding: 12px 20px; border: none; border-radius: 14px; font-weight: bold; font-size: 1rem;
-        background: white; color: var(--text); cursor: pointer; transition: all 0.2s ease;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-    }
-    
-    button:active { transform: translateY(2px); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-    
-    .btn-clear { background: #FFE3E3; color: #E53E3E; }
-    .btn-brush { background: #E0E7FF; color: #4338CA; }
+  h3{color:var(--text);font-size:1.15rem;letter-spacing:.5px}
+  h3 span{color:var(--primary);font-size:2.1rem;font-weight:800}
 
-    #alphabet {
-        display: flex; gap: 10px; overflow-x: auto; padding: 10px 5px;
-        scrollbar-width: none;
-    }
-    #alphabet::-webkit-scrollbar { display: none; }
-    
-    #alphabet button { 
-        min-width: 55px; height: 55px; font-size: 1.5rem; 
-        background: white; border: 2px solid #E2E8F0; color: var(--text);
-        border-radius: 16px; display: flex; align-items: center; justify-content: center;
-    }
-    
-    #alphabet button.active { 
-        background: var(--primary); border-color: var(--primary); 
-        color: white; transform: scale(1.1); box-shadow: 0 8px 15px rgba(108, 99, 255, 0.3);
-    }
+  .mode-switch{
+    display:flex;gap:6px;background:#fff;padding:5px;border-radius:999px;
+    box-shadow:0 2px 10px rgba(0,0,0,.06);
+  }
+  .mode-btn{
+    border:none;background:transparent;color:#94a3b8;
+    font-weight:800;font-size:1rem;padding:7px 14px;border-radius:999px;cursor:pointer;
+  }
+  .mode-btn.active{background:var(--primary);color:#fff}
+
+  #canvas-container{
+    position:relative;width:100%;max-width:410px;flex:1;
+    background:#fff;border-radius:24px;border:6px solid var(--primary);
+    box-shadow:0 15px 35px rgba(108,99,255,.15);
+    overflow:hidden;
+    touch-action:none;
+  }
+
+  canvas{position:absolute;top:0;left:0;width:100%;height:100%;touch-action:none;outline:none;}
+
+  /* ✅ FIX BUG 1: overlay não captura eventos de ponteiro,
+     deixando-os passar para o #canvas abaixo */
+  #overlay{ pointer-events: none; }
+
+  #ui{width:100%;max-width:430px;margin-top:12px;display:flex;flex-direction:column;gap:10px}
+  .row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+
+  button{
+    padding:11px 16px;border:none;border-radius:14px;font-weight:800;font-size:1rem;
+    background:#fff;color:var(--text);cursor:pointer;transition:transform .08s ease;
+    box-shadow:0 4px 10px rgba(0,0,0,.06);
+  }
+  button:active{transform:translateY(2px)}
+  .btn-clear{background:#FFE3E3;color:#E53E3E}
+  .btn-brush{background:#E0E7FF;color:#4338CA}
+
+  #scroll-wrap{
+    width:100%;
+    mask-image:linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+  }
+  #alphabet{
+    display:flex;gap:10px;overflow-x:auto;padding:10px 45%;
+    scrollbar-width:none;scroll-snap-type:x mandatory;
+  }
+  #alphabet::-webkit-scrollbar{display:none}
+  #alphabet button{
+    min-width:54px;height:54px;font-size:1.35rem;
+    border:2px solid #E2E8F0;border-radius:16px;
+    display:flex;align-items:center;justify-content:center;
+    scroll-snap-align:center;flex-shrink:0;
+  }
+  #alphabet button.active{
+    background:var(--primary);border-color:var(--primary);color:#fff;
+    transform:scale(1.10);box-shadow:0 10px 18px rgba(108,99,255,.28);
+  }
 </style>
 </head>
-<body>
 
-<h3>Letra Atual: <span id="next-label">A</span></h3>
+<body>
+<header>
+  <h3>Atual: <span id="next-label">A</span></h3>
+  <div class="mode-switch">
+    <button class="mode-btn active" id="mode-abc" type="button">ABC</button>
+    <button class="mode-btn" id="mode-123" type="button">123</button>
+  </div>
+</header>
 
 <div id="canvas-container">
-    <canvas id="canvas"></canvas>
+  <canvas id="canvas"></canvas>
+  <canvas id="overlay"></canvas>
 </div>
 
 <div id="ui">
-    <div class="row">
-        <button class="btn-brush" onclick="changeBrush(20)">Fino</button>
-        <button class="btn-brush" onclick="changeBrush(35)">Médio</button>
-        <button class="btn-brush" onclick="changeBrush(55)">Grosso</button>
-        <button class="btn-clear" onclick="resetLetter()">Limpar</button>
-    </div>
+  <div class="row">
+    <button class="btn-brush" type="button" id="brush-thin">Fino</button>
+    <button class="btn-brush" type="button" id="brush-mid">Médio</button>
+    <button class="btn-brush" type="button" id="brush-thick">Grosso</button>
+    <button class="btn-clear" type="button" id="btn-clear">Limpar</button>
+  </div>
+  <div id="scroll-wrap">
     <div id="alphabet"></div>
+  </div>
 </div>
 
 <script>
-const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d');
-const alphabetEl = document.getElementById('alphabet');
-const nextLabel = document.getElementById('next-label');
+(() => {
+  const canvas = document.getElementById('canvas');
+  const overlay = document.getElementById('overlay');
+  const ctx = canvas.getContext('2d');
+  const ctxOver = overlay.getContext('2d');
+  const container = document.getElementById('canvas-container');
+  const alphabetEl = document.getElementById('alphabet');
+  const nextLabel = document.getElementById('next-label');
 
-const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-let currentLetter = 'A';
-let brushSize = 35;
-let strokes = []; 
-let activeStrokeIndex = 0;
-let activePointIndex = 0;
-let isDrawing = false;
-let audioCtx = null;
-let selectedVoice = null;
+  const COLOR_HINT   = '#F1F5F9';
+  const COLOR_DONE   = '#48C774';
+  const COLOR_ACTIVE = '#6C63FF';
+  const COLOR_START  = '#34D399';
+  const COLOR_END    = '#FF6584';
 
-const COLOR_HINT = "#F1F5F9"; 
-const COLOR_DONE = "#48C774"; 
-const COLOR_ACTIVE = "#6C63FF"; 
-const COLOR_START = "#34D399"; 
-const COLOR_END = "#FF6584";   
+  const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+  const NUMBERS_1_100 = Array.from({length: 100}, (_, i) => String(i + 1));
 
-// Hierarquia de vozes: do mais moderno para o fallback
-function loadVoices() {
+  let mode = 'ABC';
+  let list = LETTERS;
+  let currentItem = 'A';
+  let brushSize = 40;
+
+  let strokes = [];
+  let activeStrokeIndex = 0;
+  let activePointIndex = 0;
+  let isDrawing = false;
+  let tPulse = 0;
+  let selectedVoice = null;
+  let audioCtx = null;
+
+  // --- Áudio e Voz ---
+  function loadVoices() {
     const voices = speechSynthesis.getVoices();
     selectedVoice =
-        // 1. Neural Multilíngue — mais moderna (Edge moderno)
         voices.find(v => v.name.includes('ThalitaMultilingual')) ||
-        // 2. Natural Online (Edge, requer conexão)
         voices.find(v => v.name.includes('Francisca Online (Natural)')) ||
         voices.find(v => v.name.includes('Antonio Online (Natural)')) ||
-        // 3. Google Neural (Chrome / Android)
         voices.find(v => v.name === 'Google português do Brasil') ||
         voices.find(v => v.lang === 'pt-BR' && v.name.includes('Google')) ||
-        // 4. Luciana (Safari / iOS / macOS)
         voices.find(v => v.name.includes('Luciana')) ||
-        // 5. Qualquer voz pt-BR disponível
         voices.find(v => v.lang === 'pt-BR');
-}
-speechSynthesis.onvoiceschanged = loadVoices;
+  }
+  if ('speechSynthesis' in window) {
+    speechSynthesis.onvoiceschanged = loadVoices;
+    loadVoices();
+  }
 
-function speak(text) {
+  function speak(text) {
     if (!window.speechSynthesis) return;
     speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text.toLowerCase());
-    if (selectedVoice) utterance.voice = selectedVoice;
-    utterance.lang = 'pt-BR';
-    utterance.rate = 1.0;
-    utterance.pitch = 1.0;
-    speechSynthesis.speak(utterance);
-}
+    const u = new SpeechSynthesisUtterance(String(text).toLowerCase());
+    if (selectedVoice) u.voice = selectedVoice;
+    u.lang = 'pt-BR';
+    speechSynthesis.speak(u);
+  }
 
-function playSound(freq, duration = 0.1) {
+  function playSound(freq, duration = 0.1) {
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
@@ -148,16 +182,18 @@ function playSound(freq, duration = 0.1) {
     gain.connect(audioCtx.destination);
     osc.start();
     osc.stop(audioCtx.currentTime + duration);
-}
+  }
 
-function getLine(p1, p2, steps = 30) {
+  // --- Geometria ---
+  function getLine(p1, p2) {
     let pts = [];
+    const steps = 40;
     for(let i=0; i<=steps; i++) pts.push({ x: p1.x + (p2.x-p1.x)*(i/steps), y: p1.y + (p2.y-p1.y)*(i/steps) });
     return pts;
-}
-
-function getCurve(p1, cp, p2, steps = 40) {
+  }
+  function getCurve(p1, cp, p2) {
     let pts = [];
+    const steps = 50;
     for(let i=0; i<=steps; i++) {
         let t = i/steps;
         let x = Math.pow(1-t,2)*p1.x + 2*(1-t)*t*cp.x + Math.pow(t,2)*p2.x;
@@ -165,237 +201,229 @@ function getCurve(p1, cp, p2, steps = 40) {
         pts.push({x, y});
     }
     return pts;
-}
+  }
 
-function getLetterData(l, w, h) {
-    const sX = (v) => (v/100)*w;
-    const sY = (v) => (v/100)*h;
+  function getStrokesForDigit(d, w, h, xOff=0, sW=w, pad=0) {
+    const sX = (v) => xOff + pad + (v/100)*(sW - pad*2);
+    const sY = (v) => pad + (v/100)*(h-pad*2);
+    const p = (x,y) => ({ x: sX(x), y: sY(y) });
+    let out = [];
+    switch(d) {
+      case '0': out.push([...getCurve(p(50,12),p(92,12),p(92,50)),...getCurve(p(92,50),p(92,88),p(50,88)),...getCurve(p(50,88),p(8,88),p(8,50)),...getCurve(p(8,50),p(8,12),p(50,12))]); break;
+      case '1': out.push(getLine(p(42,25),p(55,12)), getLine(p(55,12),p(55,88)), getLine(p(35,88),p(75,88))); break;
+      case '2': out.push(getCurve(p(18,30),p(50,2),p(82,30)), getLine(p(82,30),p(18,88)), getLine(p(18,88),p(82,88))); break;
+      case '3': out.push(getCurve(p(22,20),p(60,6),p(82,26)), getCurve(p(82,26),p(60,50),p(40,50)), getCurve(p(40,50),p(92,52),p(82,80)), getCurve(p(82,80),p(55,96),p(22,84))); break;
+      case '4': out.push(getLine(p(78,12),p(22,62)), getLine(p(22,62),p(88,62)), getLine(p(78,12),p(78,88))); break;
+      case '5': out.push(getLine(p(82,14),p(28,14)), getLine(p(28,14),p(22,48)), getCurve(p(22,48),p(90,44),p(84,78)), getCurve(p(84,78),p(60,96),p(22,86))); break;
+      case '6': out.push(getCurve(p(78,22),p(30,4),p(22,52)), getCurve(p(22,52),p(22,94),p(60,90)), getCurve(p(60,90),p(92,84),p(84,62)), getCurve(p(84,62),p(72,44),p(40,54))); break;
+      case '7': out.push(getLine(p(20,14),p(84,14)), getLine(p(84,14),p(42,88))); break;
+      case '8': out.push([...getCurve(p(50,50),p(20,40),p(20,25)),...getCurve(p(20,25),p(20,10),p(50,10)),...getCurve(p(50,10),p(80,10),p(80,25)),...getCurve(p(80,25),p(80,40),p(50,50)),...getCurve(p(50,50),p(20,60),p(20,75)),...getCurve(p(20,75),p(20,90),p(50,90)),...getCurve(p(50,90),p(80,90),p(80,75)),...getCurve(p(80,75),p(80,60),p(50,50))]); break;
+      case '9': out.push(getCurve(p(78,50),p(78,16),p(42,16)), getCurve(p(42,16),p(12,16),p(18,40)), getCurve(p(18,40),p(26,66),p(56,58)), getLine(p(78,40),p(52,88))); break;
+    }
+    return out;
+  }
+
+  function getLetterStrokes(l, w, h) {
+    const sX = (v) => (v/100)*w; const sY = (v) => (v/100)*h;
     const p = (x, y) => ({ x: sX(x), y: sY(y) });
     let d = [];
     switch(l) {
-        case 'A': 
-            d.push(getLine(p(50, 15), p(20, 85)), getLine(p(50, 15), p(80, 85)), getLine(p(30, 60), p(70, 60))); 
-            break;
-        case 'B': 
-            d.push(getLine(p(25, 15), p(25, 85)));
-            d.push(getCurve(p(25, 15), p(75, 15), p(80, 32)), getCurve(p(80, 32), p(75, 50), p(25, 50)));
-            d.push(getCurve(p(25, 50), p(85, 50), p(85, 68)), getCurve(p(85, 68), p(80, 85), p(25, 85))); 
-            break;
-        case 'C': 
-            d.push(getCurve(p(80, 20), p(80, 10), p(50, 10)));
-            d.push(getCurve(p(50, 10), p(15, 10), p(15, 50)));
-            d.push(getCurve(p(15, 50), p(15, 90), p(50, 90)));
-            d.push(getCurve(p(50, 90), p(80, 90), p(80, 80)));
-            break;
-        case 'D': 
-            d.push(getLine(p(28, 15), p(28, 85)));
-            d.push(getCurve(p(28, 15), p(85, 15), p(85, 50)), getCurve(p(85, 50), p(85, 85), p(28, 85))); 
-            break;
-        case 'E': 
-            d.push(getLine(p(28, 15), p(28, 85)), getLine(p(28, 15), p(75, 15)), getLine(p(28, 50), p(65, 50)), getLine(p(28, 85), p(75, 85))); 
-            break;
-        case 'F': 
-            d.push(getLine(p(28, 15), p(28, 85)), getLine(p(28, 15), p(75, 15)), getLine(p(28, 50), p(65, 50))); 
-            break;
-        case 'G': 
-            d.push(getCurve(p(80, 25), p(80, 10), p(50, 10)));
-            d.push(getCurve(p(50, 10), p(15, 10), p(15, 50)));
-            d.push(getCurve(p(15, 50), p(15, 90), p(50, 90)));
-            d.push(getCurve(p(50, 90), p(80, 90), p(80, 55)));
-            d.push(getLine(p(80, 55), p(50, 55)));
-            break;
-        case 'H': 
-            d.push(getLine(p(25, 15), p(25, 85)), getLine(p(75, 15), p(75, 85)), getLine(p(25, 50), p(75, 50))); 
-            break;
-        case 'I': 
-            d.push(getLine(p(50, 15), p(50, 85))); 
-            break;
-        case 'J': 
-            d.push(getLine(p(65, 15), p(65, 65)), getCurve(p(65, 65), p(65, 95), p(25, 80))); 
-            break;
-        case 'K': 
-            d.push(getLine(p(28, 15), p(28, 85)), getLine(p(75, 15), p(28, 50)), getLine(p(28, 50), p(75, 85))); 
-            break;
-        case 'L': 
-            d.push(getLine(p(30, 15), p(30, 85)), getLine(p(30, 85), p(75, 85))); 
-            break;
-        case 'M': 
-            d.push(getLine(p(20, 85), p(20, 15)), getLine(p(20, 15), p(50, 60)), getLine(p(50, 60), p(80, 15)), getLine(p(80, 15), p(80, 85))); 
-            break;
-        case 'N': 
-            d.push(getLine(p(25, 85), p(25, 15)), getLine(p(25, 15), p(75, 85)), getLine(p(75, 85), p(75, 15))); 
-            break;
-        case 'O': 
-            d.push(getCurve(p(50, 15), p(85, 15), p(85, 50)));
-            d.push(getCurve(p(85, 50), p(85, 85), p(50, 85)));
-            d.push(getCurve(p(50, 85), p(15, 85), p(15, 50)));
-            d.push(getCurve(p(15, 50), p(15, 15), p(50, 15)));
-            break;
-        case 'P': 
-            d.push(getLine(p(28, 15), p(28, 85)));
-            d.push(getCurve(p(28, 15), p(85, 15), p(85, 32)), getCurve(p(85, 32), p(85, 50), p(28, 50))); 
-            break;
-        case 'Q': 
-            d.push(getCurve(p(50, 15), p(85, 15), p(85, 50)));
-            d.push(getCurve(p(85, 50), p(85, 85), p(50, 85)));
-            d.push(getCurve(p(50, 85), p(15, 85), p(15, 50)));
-            d.push(getCurve(p(15, 50), p(15, 15), p(50, 15)));
-            d.push(getLine(p(60, 60), p(85, 85)));
-            break;
-        case 'R': 
-            d.push(getLine(p(28, 15), p(28, 85)));
-            d.push(getCurve(p(28, 15), p(85, 15), p(85, 32)), getCurve(p(85, 32), p(85, 50), p(28, 50)));
-            d.push(getLine(p(45, 50), p(80, 85))); 
-            break;
-        case 'S':
-            // Arco superior (como um C invertido): direita → topo → esquerda → centro
-            d.push(getCurve(p(78, 28), p(78, 12), p(50, 12)));
-            d.push(getCurve(p(50, 12), p(22, 12), p(22, 38)));
-            d.push(getCurve(p(22, 38), p(22, 50), p(50, 50)));
-            // Arco inferior (como um C normal): centro → direita → base → esquerda
-            d.push(getCurve(p(50, 50), p(78, 50), p(78, 62)));
-            d.push(getCurve(p(78, 62), p(78, 88), p(50, 88)));
-            d.push(getCurve(p(50, 88), p(22, 88), p(22, 72)));
-            break;
-        case 'T': 
-            d.push(getLine(p(20, 15), p(80, 15)), getLine(p(50, 15), p(50, 85))); 
-            break;
-        case 'U': 
-            d.push(getLine(p(25, 15), p(25, 60)), getCurve(p(25, 60), p(25, 90), p(50, 90)), getCurve(p(50, 90), p(75, 90), p(75, 60)), getLine(p(75, 60), p(75, 15))); 
-            break;
-        case 'V': 
-            d.push(getLine(p(20, 15), p(50, 85)), getLine(p(50, 85), p(80, 15))); 
-            break;
-        case 'W': 
-            d.push(getLine(p(15, 15), p(30, 85)), getLine(p(30, 85), p(50, 40)), getLine(p(50, 40), p(70, 85)), getLine(p(70, 85), p(85, 15))); 
-            break;
-        case 'X': 
-            d.push(getLine(p(20, 15), p(80, 85)), getLine(p(80, 15), p(20, 85))); 
-            break;
-        case 'Y': 
-            d.push(getLine(p(20, 15), p(50, 50)), getLine(p(80, 15), p(50, 50)), getLine(p(50, 50), p(50, 85))); 
-            break;
-        case 'Z': 
-            d.push(getLine(p(20, 15), p(80, 15)), getLine(p(80, 15), p(20, 85)), getLine(p(20, 85), p(80, 85))); 
-            break;
+      case 'A': d.push(getLine(p(50, 15), p(20, 85)), getLine(p(50, 15), p(80, 85)), getLine(p(30, 60), p(70, 60))); break;
+      case 'B': d.push(getLine(p(25,15),p(25,85)), [...getCurve(p(25,15),p(75,15),p(80,32)),...getCurve(p(80,32),p(75,50),p(25,50))], [...getCurve(p(25,50),p(85,50),p(85,68)),...getCurve(p(85,68),p(80,85),p(25,85))]); break;
+      case 'C': d.push([...getCurve(p(80,20),p(80,10),p(50,10)),...getCurve(p(50,10),p(15,10),p(15,50)),...getCurve(p(15,50),p(15,90),p(50,90)),...getCurve(p(50,90),p(80,90),p(80,80))]); break;
+      case 'D': d.push(getLine(p(28,15),p(28,85)), [...getCurve(p(28,15),p(85,15),p(85,50)),...getCurve(p(85,50),p(85,85),p(28,85))]); break;
+      case 'E': d.push(getLine(p(28,15),p(28,85)), getLine(p(28,15),p(75,15)), getLine(p(28,50),p(65,50)), getLine(p(28,85),p(75,85))); break;
+      case 'F': d.push(getLine(p(28,15),p(28,85)), getLine(p(28,15),p(75,15)), getLine(p(28,50),p(65,50))); break;
+      case 'G': d.push([...getCurve(p(80,25),p(80,10),p(50,10)),...getCurve(p(50,10),p(15,10),p(15,50)),...getCurve(p(15,50),p(15,90),p(50,90)),...getCurve(p(50,90),p(80,90),p(80,55))], getLine(p(80,55),p(50,55))); break;
+      case 'H': d.push(getLine(p(25,15),p(25,85)), getLine(p(75,15),p(75,85)), getLine(p(25,50),p(75,50))); break;
+      case 'I': d.push(getLine(p(50,15),p(50,85))); break;
+      case 'J': d.push(getLine(p(65,15),p(65,65)), getCurve(p(65,65),p(65,95),p(25,80))); break;
+      case 'K': d.push(getLine(p(28,15),p(28,85)), getLine(p(75,15),p(28,50)), getLine(p(28,50),p(75,85))); break;
+      case 'L': d.push(getLine(p(30,15),p(30,85)), getLine(p(30,85),p(75,85))); break;
+      case 'M': d.push(getLine(p(20,85),p(20,15)), getLine(p(20,15),p(50,60)), getLine(p(50,60),p(80,15)), getLine(p(80,15),p(80,85))); break;
+      case 'N': d.push(getLine(p(25,85),p(25,15)), getLine(p(25,15),p(75,85)), getLine(p(75,85),p(75,15))); break;
+      case 'O': d.push([...getCurve(p(50,15),p(85,15),p(85,50)),...getCurve(p(85,50),p(85,85),p(50,85)),...getCurve(p(50,85),p(15,85),p(15,50)),...getCurve(p(15,50),p(15,15),p(50,15))]); break;
+      case 'P': d.push(getLine(p(28,15),p(28,85)), [...getCurve(p(28,15),p(85,15),p(85,32)),...getCurve(p(85,32),p(85,50),p(28,50))]); break;
+      case 'Q': d.push([...getCurve(p(50,15),p(85,15),p(85,50)),...getCurve(p(85,50),p(85,85),p(50,85)),...getCurve(p(50,85),p(15,85),p(15,50)),...getCurve(p(15,50),p(15,15),p(50,15))], getLine(p(60,60),p(85,85))); break;
+      case 'R': d.push(getLine(p(28,15),p(28,85)), [...getCurve(p(28,15),p(85,15),p(85,32)),...getCurve(p(85,32),p(85,50),p(28,50))], getLine(p(45,50),p(80,85))); break;
+      case 'S': d.push([...getCurve(p(78,28),p(78,12),p(50,12)),...getCurve(p(50,12),p(22,12),p(22,38)),...getCurve(p(22,38),p(22,50),p(50,50)),...getCurve(p(50,50),p(78,50),p(78,62)),...getCurve(p(78,62),p(78,88),p(50,88)),...getCurve(p(50,88),p(22,88),p(22,72))]); break;
+      case 'T': d.push(getLine(p(20,15),p(80,15)), getLine(p(50,15),p(50,85))); break;
+      case 'U': d.push([...getLine(p(25,15),p(25,60)),...getCurve(p(25,60),p(25,90),p(50,90)),...getCurve(p(50,90),p(75,90),p(75,60)),...getLine(p(75,60),p(75,15))]); break;
+      case 'V': d.push(getLine(p(20,15),p(50,85)), getLine(p(50,85),p(80,15))); break;
+      case 'W': d.push(getLine(p(15,15),p(30,85)), getLine(p(30,85),p(50,40)), getLine(p(50,40),p(70,85)), getLine(p(70,85),p(85,15))); break;
+      case 'X': d.push(getLine(p(20,15),p(80,85)), getLine(p(80,15),p(20,85))); break;
+      case 'Y': d.push(getLine(p(20,15),p(50,50)), getLine(p(80,15),p(50,50)), getLine(p(50,50),p(50,85))); break;
+      case 'Z': d.push(getLine(p(20,15),p(80,15)), getLine(p(80,15),p(20,85)), getLine(p(20,85),p(80,85))); break;
     }
-    return d.map(pts => ({ points: pts, completed: false }));
-}
+    return d;
+  }
 
-function drawScene() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    strokes.forEach(s => drawPath(s.points, COLOR_HINT, brushSize));
-    strokes.forEach((s, idx) => {
-        if(s.completed) {
-            drawPath(s.points, COLOR_DONE, brushSize);
-        } else if (idx === activeStrokeIndex) {
-            drawPath(s.points.slice(0, activePointIndex), COLOR_ACTIVE, brushSize);
-            const start = s.points[0];
-            const end = s.points[s.points.length-1];
-            ctx.beginPath();
-            ctx.arc(start.x, start.y, brushSize/1.8, 0, Math.PI*2);
-            ctx.fillStyle = COLOR_START; ctx.fill();
-            ctx.beginPath();
-            ctx.arc(end.x, end.y, brushSize/1.6, 0, Math.PI*2);
-            ctx.lineWidth = 4; ctx.strokeStyle = COLOR_END; ctx.stroke();
-        }
-    });
-}
+  function buildStrokesForItem(item) {
+    const w = canvas.width, h = canvas.height;
+    let raw = [];
+    if (mode === 'ABC') {
+      raw = getLetterStrokes(item, w, h);
+    } else {
+      const text = String(item);
+      const digits = text.split('');
+      const pad = Math.max(15, w*0.06);
+      const slotW = w / digits.length;
+      digits.forEach((d, i) => raw.push(...getStrokesForDigit(d, w, h, i*slotW, slotW, pad)));
+    }
+    strokes = raw.map(pts => ({ points: pts, completed: false }));
+    activeStrokeIndex = 0; activePointIndex = 0; isDrawing = false;
+  }
 
-function drawPath(pts, color, width) {
-    if(pts.length < 2) return;
-    ctx.beginPath();
-    ctx.strokeStyle = color; ctx.lineWidth = width;
-    ctx.lineCap = "round"; ctx.lineJoin = "round";
+  // --- Render ---
+  function drawPath(pts, color, width) {
+    if (pts.length < 2) return;
+    ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = width;
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round';
     ctx.moveTo(pts[0].x, pts[0].y);
     pts.forEach(p => ctx.lineTo(p.x, p.y));
     ctx.stroke();
-}
+  }
 
-function handleInput(e) {
+  function draw() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    strokes.forEach(s => drawPath(s.points, COLOR_HINT, brushSize));
+    strokes.forEach((s, idx) => {
+      if (s.completed) drawPath(s.points, COLOR_DONE, brushSize);
+      else if (idx === activeStrokeIndex) {
+        drawPath(s.points.slice(0, activePointIndex), COLOR_ACTIVE, brushSize);
+        const start = s.points[0];
+        const end = s.points[s.points.length-1];
+        const current = s.points[activePointIndex];
+
+        // Start Circle
+        ctx.beginPath(); ctx.arc(start.x, start.y, brushSize/1.8, 0, Math.PI*2);
+        ctx.fillStyle = COLOR_START; ctx.fill();
+        // End Circle
+        ctx.beginPath(); ctx.arc(end.x, end.y, brushSize/1.6, 0, Math.PI*2);
+        ctx.lineWidth = 4; ctx.strokeStyle = COLOR_END; ctx.stroke();
+
+        if(current){
+          const pls = Math.sin(tPulse)*5;
+          ctx.beginPath(); ctx.arc(current.x, current.y, brushSize/2 + pls, 0, Math.PI*2);
+          ctx.fillStyle = 'rgba(108,99,255,0.2)'; ctx.fill();
+        }
+      }
+    });
+    stepConfetti();
+  }
+
+  // --- Confetes ---
+  let confetti = [];
+  function spawnConfetti() {
+    for (let i = 0; i < 80; i++) {
+      confetti.push({
+        x: canvas.width/2, y: canvas.height/2,
+        vx: (Math.random()-0.5)*12, vy: (Math.random()*-1)*14-4,
+        g: 0.35, r: Math.random()*Math.PI, vr: (Math.random()-0.5)*0.2,
+        s: Math.random()*8+5, c: ['#6C63FF','#FF6584','#48C774','#F59E0B'][Math.random()*4|0], life: 100
+      });
+    }
+  }
+  function stepConfetti() {
+    ctxOver.clearRect(0,0,overlay.width,overlay.height);
+    confetti.forEach((p, i) => {
+      p.x+=p.vx; p.y+=p.vy; p.vy+=p.g; p.r+=p.vr; p.life--;
+      ctxOver.save(); ctxOver.translate(p.x, p.y); ctxOver.rotate(p.r);
+      ctxOver.fillStyle = p.c; ctxOver.fillRect(-p.s/2, -p.s/2, p.s, p.s*0.6); ctxOver.restore();
+    });
+    confetti = confetti.filter(p => p.life > 0);
+  }
+
+  // --- Interaction ---
+  function getXY(e) {
+    const r = canvas.getBoundingClientRect();
+    const t = e.touches ? e.touches[0] : e;
+    // ✅ FIX BUG 2: escalar coordenadas CSS → pixels do canvas
+    return {
+      x: (t.clientX - r.left) * (canvas.width  / r.width),
+      y: (t.clientY - r.top)  * (canvas.height / r.height)
+    };
+  }
+
+  canvas.addEventListener('pointerdown', (e) => {
+    const {x, y} = getXY(e);
+    const startPt = strokes[activeStrokeIndex]?.points[0];
+    if(startPt && Math.hypot(x-startPt.x, y-startPt.y) < brushSize * 2.8){
+      isDrawing = true;
+      playSound(400, 0.05);
+    }
+  });
+
+  window.addEventListener('pointermove', (e) => {
     if(!isDrawing) return;
-    const rect = canvas.getBoundingClientRect();
-    const touch = e.touches ? e.touches[0] : e;
-    const x = touch.clientX - rect.left;
-    const y = touch.clientY - rect.top;
-    const stroke = strokes[activeStrokeIndex];
-    if(!stroke) return;
-    const target = stroke.points[activePointIndex];
+    const {x, y} = getXY(e);
+    const s = strokes[activeStrokeIndex];
+    if(!s) return;
+    const target = s.points[activePointIndex];
     if(!target) return;
 
-    const dist = Math.hypot(x - target.x, y - target.y);
-    if(dist < brushSize * 2.2) {
-        activePointIndex += 4; 
-        if(activePointIndex >= stroke.points.length) {
-            stroke.completed = true;
-            activeStrokeIndex++;
-            activePointIndex = 0;
-            playSound(600); 
-            if(activeStrokeIndex >= strokes.length) finish();
+    if(Math.hypot(x-target.x, y-target.y) < brushSize * 2.2){
+      activePointIndex += 4;
+      if(activePointIndex >= s.points.length){
+        s.completed = true; activeStrokeIndex++; activePointIndex = 0;
+        playSound(600, 0.1);
+        if(activeStrokeIndex >= strokes.length) {
+          isDrawing = false; spawnConfetti(); playSound(1000, 0.3);
+          setTimeout(() => selectItem(list[(list.indexOf(currentItem)+1)%list.length]), 1500);
         }
-        drawScene();
+      }
     }
-}
+  });
 
-function finish() {
-    isDrawing = false;
-    playSound(1000, 0.3);
-    setTimeout(() => {
-        let currentIndex = LETTERS.indexOf(currentLetter);
-        let nextIndex = (currentIndex + 1) % LETTERS.length;
-        selectLetter(LETTERS[nextIndex]);
-    }, 1200);
-}
+  window.addEventListener('pointerup', () => isDrawing = false);
 
-function selectLetter(l) {
-    currentLetter = l;
-    nextLabel.textContent = l;
-    document.querySelectorAll('#alphabet button').forEach(x => {
-        x.classList.toggle('active', x.textContent === l);
+  function selectItem(item) {
+    currentItem = String(item);
+    nextLabel.textContent = currentItem;
+    document.querySelectorAll('#alphabet button').forEach(b => {
+      b.classList.toggle('active', b.textContent === currentItem);
+      if (b.classList.contains('active')) b.scrollIntoView({behavior:'smooth', inline:'center'});
     });
-    speak(l);
-    resetLetter();
-}
+    speak(currentItem);
+    buildStrokesForItem(currentItem);
+  }
 
-function resetLetter() {
-    activeStrokeIndex = 0;
-    activePointIndex = 0;
-    isDrawing = false;
-    strokes = getLetterData(currentLetter, canvas.width, canvas.height);
-    drawScene();
-}
-
-function changeBrush(s) { brushSize = s; drawScene(); }
-
-function init() {
-    const r = canvas.parentElement.getBoundingClientRect();
-    canvas.width = r.width;
-    canvas.height = r.height;
-    loadVoices();
-    alphabetEl.innerHTML = "";
-    LETTERS.split("").forEach(l => {
-        const b = document.createElement('button');
-        b.textContent = l;
-        b.onclick = () => selectLetter(l);
-        alphabetEl.appendChild(b);
+  function setMode(m) {
+    mode = m;
+    list = mode==='ABC'?LETTERS:NUMBERS_1_100;
+    document.getElementById('mode-abc').classList.toggle('active', mode==='ABC');
+    document.getElementById('mode-123').classList.toggle('active', mode==='123');
+    alphabetEl.innerHTML='';
+    list.forEach(it => {
+      const b=document.createElement('button');
+      b.textContent=it; b.onclick=()=>selectItem(it);
+      alphabetEl.appendChild(b);
     });
-    selectLetter('A');
-}
+    selectItem(list[0]);
+  }
 
-canvas.addEventListener('pointerdown', (e) => {
-    if (!audioCtx) audioCtx = new AudioContext();
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const startPt = strokes[activeStrokeIndex]?.points[0];
-    if(startPt && Math.hypot(x - startPt.x, y - startPt.y) < brushSize * 2.8) isDrawing = true;
-});
+  // ✅ FIX BUG 2: usar canvas.getBoundingClientRect() para dimensões precisas
+  function resize() {
+    const r = canvas.getBoundingClientRect();
+    canvas.width = overlay.width = r.width;
+    canvas.height = overlay.height = r.height;
+    buildStrokesForItem(currentItem);
+  }
 
-canvas.addEventListener('pointermove', handleInput);
-window.addEventListener('pointerup', () => isDrawing = false);
+  document.getElementById('brush-thin').onclick = () => { brushSize=22; draw(); };
+  document.getElementById('brush-mid').onclick = () => { brushSize=40; draw(); };
+  document.getElementById('brush-thick').onclick = () => { brushSize=60; draw(); };
+  document.getElementById('btn-clear').onclick = () => buildStrokesForItem(currentItem);
+  document.getElementById('mode-abc').onclick = () => setMode('ABC');
+  document.getElementById('mode-123').onclick = () => setMode('123');
 
-window.onload = init;
-window.onresize = init;
+  function loop() { tPulse+=0.1; draw(); requestAnimationFrame(loop); }
+
+  window.onresize = resize;
+  resize();
+  setMode('ABC');
+  loop();
+})();
 </script>
 </body>
 </html>
